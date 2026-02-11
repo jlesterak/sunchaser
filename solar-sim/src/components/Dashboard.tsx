@@ -273,7 +273,7 @@ export const Dashboard: React.FC = () => {
                 </h2>
 
                 <div className="flex bg-zinc-900 rounded p-1">
-                    {[1, 7, 30].map(d => (
+                    {[1, 7, 14, 30].map(d => (
                         <button
                             key={d}
                             onClick={() => setSimulationDays(d)}
