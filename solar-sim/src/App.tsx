@@ -1,8 +1,10 @@
 import { SystemProvider } from './context/SystemContext';
 import { ConfigPanel } from './components/ConfigPanel';
-import { LoadScheduler } from './components/LoadScheduler';
+import { DeviceManager } from './components/DeviceManager';
+import { ScheduleManager } from './components/ScheduleManager';
 import { LocationDatePanel } from './components/LocationDatePanel';
 import { Dashboard } from './components/Dashboard';
+import { PresetManager } from './components/PresetManager';
 
 function AppContent() {
   return (
@@ -17,6 +19,8 @@ function AppContent() {
         {/* Left Column: Configuration & Controls */}
         <div className="xl:col-span-4 space-y-8">
           <ConfigPanel />
+          <DeviceManager />
+          <PresetManager />
           <LocationDatePanel />
           <div className="bg-zinc-800 p-6 rounded-lg shadow-lg">
             <h3 className="font-semibold text-lg mb-2 text-zinc-300">Tips</h3>
@@ -31,7 +35,7 @@ function AppContent() {
         {/* Right Column: Visualization & Detailed Load Mgmt */}
         <div className="xl:col-span-8 space-y-8">
           <Dashboard />
-          <LoadScheduler />
+          <ScheduleManager />
         </div>
 
       </main>

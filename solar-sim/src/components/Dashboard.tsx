@@ -32,7 +32,7 @@ ChartJS.register(
 );
 
 export const Dashboard: React.FC = () => {
-    const { batterySpecs, solarSpecs, location, loads, simulationDate, simulationDays, setSimulationDays, useLiveWeather } = useSystem();
+    const { batterySpecs, solarSpecs, location, devices, schedules, simulationDate, simulationDays, setSimulationDays, useLiveWeather } = useSystem();
     const [weatherData, setWeatherData] = useState<{ [timeKey: string]: number } | undefined>(undefined);
     const [isLoadingWeather, setIsLoadingWeather] = useState(false);
 
@@ -70,25 +70,47 @@ export const Dashboard: React.FC = () => {
         // 1. Generate Solar Data
         const solarData = simulateSolarGeneration(simulationDate, simulationDays, location, solarSpecs, weatherData);
 
-        // 2. Generate Load Data
-        // We need to sum up all loads for each 15-min interval
+        // 2. Generate Load Data (Aggregated from all enabled schedules)
         const loadData = solarData.map((step) => {
             const stepDateTime = DateTime.fromJSDate(step.time);
-            // Luxon weekday: 1 (Mon) - 7 (Sun). Array index: 0 (Mon) - 6 (Sun).
-            const dayIndex = stepDateTime.weekday - 1;
-            const hourIndex = stepDateTime.hour;
-            const minuteIndex = Math.floor(stepDateTime.minute / 15);
+            // Convert to 0=Mon, 6=Sun
+            const dayOfWeek = (stepDateTime.weekday - 1);
+            const slotInDay = Math.floor((stepDateTime.hour * 60 + stepDateTime.minute) / 15);
+            const slotIndex = (dayOfWeek * 96) + slotInDay;
 
-            const slotIndex = (dayIndex * 96) + (hourIndex * 4) + minuteIndex;
-
-            let totalLoadKw = 0;
-            loads.forEach(load => {
-                if (load.enabled && load.schedule.activeSlots[slotIndex]) {
-                    totalLoadKw += load.powerWatts / 1000;
-                }
+            let activeDeviceIds = new Set<string>();
+            schedules.filter(s => s.enabled && s.activeSlots[slotIndex]).forEach(schedule => {
+                schedule.deviceIds.forEach(id => activeDeviceIds.add(id));
             });
 
-            return { time: step.time, powerKw: totalLoadKw };
+            // Filter by dependencies
+            let changed = true;
+            while (changed) {
+                changed = false;
+                const nextActiveIds = new Set<string>();
+                activeDeviceIds.forEach(id => {
+                    const device = devices.find(d => d.id === id);
+                    if (device && (!device.requiresDeviceId || activeDeviceIds.has(device.requiresDeviceId))) {
+                        nextActiveIds.add(id);
+                    } else {
+                        changed = true;
+                    }
+                });
+                if (nextActiveIds.size !== activeDeviceIds.size) {
+                    activeDeviceIds = nextActiveIds;
+                    changed = true;
+                } else {
+                    changed = false;
+                }
+            }
+
+            let totalPowerWatts = 0;
+            activeDeviceIds.forEach(id => {
+                const device = devices.find(d => d.id === id);
+                if (device) totalPowerWatts += device.powerWatts;
+            });
+
+            return { time: step.time, powerKw: totalPowerWatts / 1000 };
         });
 
         // 3. Simulate Battery
@@ -119,7 +141,7 @@ export const Dashboard: React.FC = () => {
         }
 
         return { steps, dailyStats };
-    }, [batterySpecs, solarSpecs, location, loads, simulationDate, simulationDays, weatherData]);
+    }, [batterySpecs, solarSpecs, location, devices, schedules, simulationDate, simulationDays, weatherData]);
 
     // Chart Data Logic
     let ChartComponent = Line;
