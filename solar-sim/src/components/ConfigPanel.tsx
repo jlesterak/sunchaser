@@ -1,7 +1,7 @@
 
-import { Battery, Sun, Download, Upload } from 'lucide-react';
+import { Battery, Sun, Download, Upload, Save, Check } from 'lucide-react';
 import { useSystem } from '../context/SystemContext';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 export const ConfigPanel: React.FC = () => {
     const {
@@ -9,10 +9,12 @@ export const ConfigPanel: React.FC = () => {
         solarSpecs, setSolarSpecs,
         useLiveWeather, setUseLiveWeather,
         location, loads, simulationDate, simulationDays,
-        importSystemData
+        importSystemData,
     } = useSystem();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [showSavedFeedback, setShowSavedFeedback] = useState(false);
 
     const handleBatteryChange = (key: keyof typeof batterySpecs, value: number) => {
         setBatterySpecs({ ...batterySpecs, [key]: value });
@@ -41,6 +43,24 @@ export const ConfigPanel: React.FC = () => {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+    };
+
+    const handleSaveToBrowser = () => {
+        setIsSaving(true);
+        const data = {
+            batterySpecs,
+            solarSpecs,
+            location,
+            loads,
+            simulationDate,
+            simulationDays,
+            useLiveWeather
+        };
+        localStorage.setItem('solar-sim-config', JSON.stringify(data));
+
+        setIsSaving(false);
+        setShowSavedFeedback(true);
+        setTimeout(() => setShowSavedFeedback(false), 3000);
     };
 
     const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,17 +161,37 @@ export const ConfigPanel: React.FC = () => {
             <div className="mt-8 pt-6 border-t border-zinc-700 flex gap-4">
                 <button
                     onClick={handleExport}
-                    className="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors"
+                    className="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-zinc-600"
                 >
                     <Download size={18} />
-                    Export Config
+                    Export
                 </button>
                 <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors"
+                    className="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-zinc-600"
                 >
                     <Upload size={18} />
-                    Import Config
+                    Import
+                </button>
+                <button
+                    onClick={handleSaveToBrowser}
+                    disabled={isSaving}
+                    className={`flex-[1.5] px-4 py-2 rounded flex items-center justify-center gap-2 transition-all border ${showSavedFeedback
+                            ? 'bg-green-600 border-green-500 text-white shadow-[0_0_15px_rgba(22,163,74,0.4)]'
+                            : 'bg-blue-600 hover:bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-900/20'
+                        }`}
+                >
+                    {showSavedFeedback ? (
+                        <>
+                            <Check size={18} className="animate-in zoom-in duration-300" />
+                            Saved to Browser!
+                        </>
+                    ) : (
+                        <>
+                            <Save size={18} />
+                            Save to Browser
+                        </>
+                    )}
                 </button>
                 <input
                     type="file"

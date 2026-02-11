@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { BatterySpecs } from '../utils/battery-sim';
 import type { SolarSystemSpecs, Location } from '../utils/solar-sim';
 
@@ -88,6 +88,19 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         if (data.simulationDays) setSimulationDays(data.simulationDays);
         if (data.useLiveWeather !== undefined) setUseLiveWeather(data.useLiveWeather);
     };
+
+    // Load from LocalStorage on mount
+    useEffect(() => {
+        const saved = localStorage.getItem('solar-sim-config');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                importSystemData(data);
+            } catch (err) {
+                console.error("Failed to load saved config from local storage", err);
+            }
+        }
+    }, []);
 
     return (
         <SystemContext.Provider value={{
