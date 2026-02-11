@@ -80,14 +80,42 @@ const defaultLocation: Location = {
     longitude: -118.25,
 };
 
+const defaultDevices: Device[] = [
+    { id: 'dev-inverter', name: 'Power Inverter', powerWatts: 50 },
+    { id: 'dev-fridge', name: 'Refrigerator', powerWatts: 150 },
+    { id: 'dev-tv', name: 'Television', powerWatts: 100, requiresDeviceId: 'dev-inverter' },
+];
+
+const defaultSchedules: Schedule[] = [
+    {
+        id: 'sch-critical',
+        name: 'Critical Loads',
+        deviceIds: ['dev-inverter', 'dev-fridge'],
+        activeSlots: new Array(672).fill(true),
+        enabled: true,
+        color: 'hsl(142, 70%, 50%)'
+    },
+    {
+        id: 'sch-entertainment',
+        name: 'Evening Entertainment',
+        deviceIds: ['dev-tv'],
+        activeSlots: new Array(672).fill(false).map((_, i) => {
+            const hour = Math.floor((i % 96) / 4);
+            return hour >= 18 && hour < 23;
+        }),
+        enabled: true,
+        color: 'hsl(217, 70%, 50%)'
+    }
+];
+
 const SystemContext = createContext<SystemContextType | undefined>(undefined);
 
 export function SystemProvider({ children }: { children: ReactNode }) {
     const [batterySpecs, setBatterySpecs] = useState<BatterySpecs>(defaultBattery);
     const [solarSpecs, setSolarSpecs] = useState<SolarSystemSpecs>(defaultSolar);
     const [location, setLocation] = useState<Location>(defaultLocation);
-    const [devices, setDevices] = useState<Device[]>([]);
-    const [schedules, setSchedules] = useState<Schedule[]>([]);
+    const [devices, setDevices] = useState<Device[]>(defaultDevices);
+    const [schedules, setSchedules] = useState<Schedule[]>(defaultSchedules);
     const [presets, setPresets] = useState<Preset[]>([]);
     const [simulationDate, setSimulationDate] = useState<Date>(() => {
         const d = new Date();

@@ -8,7 +8,7 @@ export const ConfigPanel: React.FC = () => {
         batterySpecs, setBatterySpecs,
         solarSpecs, setSolarSpecs,
         useLiveWeather, setUseLiveWeather,
-        location, devices, schedules, simulationDate, simulationDays,
+        location, devices, schedules, presets, simulationDate, simulationDays,
         importSystemData,
     } = useSystem();
 
@@ -40,6 +40,7 @@ export const ConfigPanel: React.FC = () => {
             location,
             devices,
             schedules,
+            presets,
             simulationDate,
             simulationDays,
             useLiveWeather
@@ -63,6 +64,7 @@ export const ConfigPanel: React.FC = () => {
             location,
             devices,
             schedules,
+            presets,
             simulationDate,
             simulationDays,
             useLiveWeather
