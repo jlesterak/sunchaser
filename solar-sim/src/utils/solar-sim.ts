@@ -33,14 +33,35 @@ export function calculateSolarPower(
     // Get sun position
     const sunPos = SunCalc.getPosition(date, location.latitude, location.longitude);
     const altitude = sunPos.altitude; // In radians. 0 is horizon, PI/2 is zenith.
+    const solarAzimuth = sunPos.azimuth; // In radians. 0 is South, negative is East, positive is West. (SunCalc standard)
 
     // If sun is below horizon, 0 power
     if (altitude <= 0) {
         return 0;
     }
 
-    // Simplified Clear Sky Model
-    const incidenceFactor = Math.sin(altitude);
+    // Convert degrees to radians for specs
+    const tilt = (specs.tiltAngle || location.latitude) * Math.PI / 180;
+    const panelAzimuth = (specs.azimuth || 180) * Math.PI / 180; // Default 180 (South)
+
+    // Tilted Surface Irradiance Model
+    // 1. Clear sky beam irradiance factor (Simplified)
+    // Formula for incidence angle theta:
+    // cos(theta) = sin(altitude) * cos(tilt) + cos(altitude) * sin(tilt) * cos(solarAzimuth - panelAzimuth)
+
+    // Note: SunCalc azimuth is 0 at South. 
+    // We want the panel azimuth to match this. South = 0.
+    // If user provides 180, we need to normalize if we use a 0-South reference.
+    // Let's assume user provides degrees where 0=N, 90=E, 180=S, 270=W.
+    // SunCalc azimuth: 0 = South, negative = East (-PI/2 = 90 deg), positive = West (PI/2 = 270 deg).
+    // So shift user azimuth to SunCalc system: SunAz = UserAz - 180.
+    const normalizedPanelAzimuth = (panelAzimuth - Math.PI);
+
+    const cosTheta = Math.sin(altitude) * Math.cos(tilt) +
+        Math.cos(altitude) * Math.sin(tilt) * Math.cos(solarAzimuth - normalizedPanelAzimuth);
+
+    // Incidence factor is max(0, cosTheta)
+    const incidenceFactor = Math.max(0, cosTheta);
 
     // System losses and efficiency
     // If the sun is very low (e.g. < 5 deg), generation is negligible/zero due to atmosphere and obstacles.

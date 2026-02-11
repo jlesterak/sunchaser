@@ -17,7 +17,16 @@ export const ConfigPanel: React.FC = () => {
     const [showSavedFeedback, setShowSavedFeedback] = useState(false);
 
     const handleBatteryChange = (key: keyof typeof batterySpecs, value: number) => {
-        setBatterySpecs({ ...batterySpecs, [key]: value });
+        let newSpecs = { ...batterySpecs, [key]: value };
+
+        // Synchronize fields
+        if (key === 'voltage' || key === 'ampHours') {
+            newSpecs.capacityKwh = (newSpecs.voltage * newSpecs.ampHours) / 1000;
+        } else if (key === 'capacityKwh') {
+            newSpecs.ampHours = (newSpecs.capacityKwh * 1000) / newSpecs.voltage;
+        }
+
+        setBatterySpecs(newSpecs);
     };
 
     const handleSolarChange = (key: keyof typeof solarSpecs, value: number) => {
@@ -94,11 +103,32 @@ export const ConfigPanel: React.FC = () => {
                 <div className="space-y-4">
                     <h3 className="font-semibold text-lg text-zinc-300">Battery Bank</h3>
 
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-zinc-400 mb-1">Voltage (V)</label>
+                            <input
+                                type="number"
+                                value={batterySpecs.voltage}
+                                onChange={(e) => handleBatteryChange('voltage', parseFloat(e.target.value) || 0)}
+                                className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-zinc-400 mb-1">Capacity (Ah)</label>
+                            <input
+                                type="number"
+                                value={batterySpecs.ampHours}
+                                onChange={(e) => handleBatteryChange('ampHours', parseFloat(e.target.value) || 0)}
+                                className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                    </div>
+
                     <div>
-                        <label className="block text-sm font-medium text-zinc-400 mb-1">Capacity (kWh)</label>
+                        <label className="block text-sm font-medium text-zinc-400 mb-1">Total Capacity (kWh)</label>
                         <input
                             type="number"
-                            value={batterySpecs.capacityKwh}
+                            value={batterySpecs.capacityKwh.toFixed(2)}
                             onChange={(e) => handleBatteryChange('capacityKwh', parseFloat(e.target.value) || 0)}
                             className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
                         />
@@ -124,14 +154,26 @@ export const ConfigPanel: React.FC = () => {
                         Solar Array
                     </h3>
 
-                    <div>
-                        <label className="block text-sm font-medium text-zinc-400 mb-1">Array Size (kW)</label>
-                        <input
-                            type="number"
-                            value={solarSpecs.arraySizeKw}
-                            onChange={(e) => handleSolarChange('arraySizeKw', parseFloat(e.target.value) || 0)}
-                            className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-                        />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-zinc-400 mb-1">Array Size (kW)</label>
+                            <input
+                                type="number"
+                                value={solarSpecs.arraySizeKw}
+                                onChange={(e) => handleSolarChange('arraySizeKw', parseFloat(e.target.value) || 0)}
+                                className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-zinc-400 mb-1">Panel Tilt (°)</label>
+                            <input
+                                type="number"
+                                value={solarSpecs.tiltAngle}
+                                onChange={(e) => handleSolarChange('tiltAngle', parseFloat(e.target.value) || 0)}
+                                className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                                placeholder="Auto: Lat"
+                            />
+                        </div>
                     </div>
 
                     <div>
@@ -177,8 +219,8 @@ export const ConfigPanel: React.FC = () => {
                     onClick={handleSaveToBrowser}
                     disabled={isSaving}
                     className={`flex-[1.5] px-4 py-2 rounded flex items-center justify-center gap-2 transition-all border ${showSavedFeedback
-                            ? 'bg-green-600 border-green-500 text-white shadow-[0_0_15px_rgba(22,163,74,0.4)]'
-                            : 'bg-blue-600 hover:bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-900/20'
+                        ? 'bg-green-600 border-green-500 text-white shadow-[0_0_15px_rgba(22,163,74,0.4)]'
+                        : 'bg-blue-600 hover:bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-900/20'
                         }`}
                 >
                     {showSavedFeedback ? (

@@ -42,6 +42,8 @@ interface SystemContextType extends SystemState {
 
 const defaultBattery: BatterySpecs = {
     capacityKwh: 10,
+    voltage: 48,
+    ampHours: 208,
     efficiency: 0.95,
     maxChargeRateKw: 5,
     maxDischargeRateKw: 5,
@@ -80,7 +82,13 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     const removeLoad = (id: string) => setLoads(prev => prev.filter(l => l.id !== id));
 
     const importSystemData = (data: any) => {
-        if (data.batterySpecs) setBatterySpecs(data.batterySpecs);
+        if (data.batterySpecs) {
+            const b = data.batterySpecs;
+            // Handle migration or missing fields
+            if (b.voltage === undefined) b.voltage = 48;
+            if (b.ampHours === undefined) b.ampHours = Math.round((b.capacityKwh * 1000) / b.voltage);
+            setBatterySpecs(b);
+        }
         if (data.solarSpecs) setSolarSpecs(data.solarSpecs);
         if (data.location) setLocation(data.location);
         if (data.loads) setLoads(data.loads);

@@ -2,6 +2,8 @@
 
 export interface BatterySpecs {
     capacityKwh: number; // Total capacity in kWh
+    voltage: number; // System voltage (e.g., 12, 24, 48)
+    ampHours: number; // Capacity in Ah
     efficiency: number; // Round-trip efficiency (e.g., 0.95)
     maxChargeRateKw: number; // Max charge power in kW
     maxDischargeRateKw: number; // Max discharge power in kW

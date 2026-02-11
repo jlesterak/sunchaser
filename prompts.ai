@@ -46,3 +46,8 @@ In addition to the import/export, can you add just a 'save' button that will sav
 
 **Prompt 11:**
 Can you please transcribe all of my requests for this entire project into a prompts.ai file. Please remember to transcribe every single prompt I give you for this project into that file.
+
+**Prompt 12:**
+Can you add:
+The option to add a solar panel tilt angle & consider that in calculations
+The option to input voltage & AH of the battery and have each field (V, AH, KWH) update dynamically
