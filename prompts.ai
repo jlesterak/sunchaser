@@ -1,0 +1,48 @@
+# Solar Estimator - Transcription of User Prompts
+
+This file contains every prompt provided for the development of the Solar & Battery Simulator project.
+
+---
+
+### Phase 1: Initial Development & Core Features (Conversation 1)
+
+**Prompt 1:**
+I want to build a web application to simulate off-grid power systems. Users should be able to define system specs (battery capacity and solar array size), manage loads with a detailed scheduling interface (down to 15-minute precision), and visualize performance (battery State of Charge, solar generation, and load consumption) over time based on location and date.
+
+**Prompt 2:**
+Can we add some tools to make scheduling easier? I'd like to be able to duplicate a load and also copy a daily schedule from one day to all weekdays or all days of the week.
+
+**Prompt 3 (Optimization):**
+Can we also simulate longer durations, like 7 days or 30 days? The dashboard should update to show daily summaries (like min/max SoC and total kWh) instead of just the detailed hourly view so it's readable.
+
+---
+
+### Phase 2: Weather Integration (Conversation 2)
+
+**Prompt 4:**
+Can we integrate real-world weather data using the Open-Meteo API? I want to adjust the solar generation estimates based on cloud cover forecast data. It should have a toggle in the configuration panel to enable or disable live weather data, and the dashboard should show if weather is active.
+
+---
+
+### Phase 3: GitHub, Hosting & Persistence (Conversation 3 - Current)
+
+**Prompt 5:**
+Can you push this to my github please and also how can I host this?
+
+**Prompt 6:**
+Aight can you publish to git pages please? What are the limitations of this free hosting?
+
+**Prompt 7:**
+Does this project qualify for the free tier?
+
+**Prompt 8:**
+I keep saying 'last request' and then keep requesting more. Sorry, but you are stunning. Can we add a 2-week graph please?
+
+**Prompt 9:**
+how do I commit & push and will pages update automagically?
+
+**Prompt 10:**
+In addition to the import/export, can you add just a 'save' button that will save the config into a cookie or something? IDK how web apps work, sorry. I don't want to have to require agreeing to cookies or saving data unless the EU clicks save & agrees.
+
+**Prompt 11:**
+Can you please transcribe all of my requests for this entire project into a prompts.ai file. Please remember to transcribe every single prompt I give you for this project into that file.
