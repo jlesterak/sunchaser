@@ -50,20 +50,9 @@ export const Dashboard: React.FC = () => {
                 // Transform to Map
                 const map: { [key: string]: number } = {};
                 data.time.forEach((t, i) => {
-                    // Open-Meteo time is ISO string YYYY-MM-DDTHH:mm
-                    map[t + ":00"] = data.cloud_cover[i]; // append seconds if needed to match ISO? 
-                    // Wait, Open-Meteo returns "2023-10-27T00:00". Our solar-sim uses .toISOString() which is "2023-10-27T00:00:00.000Z".
-                    // We need to match the keys.
-                    // Let's normalize to "YYYY-MM-DDTHH:00".
-                    // The solar-sim uses `time.toISOString().slice(0, 13) + ":00"` which results in "2023-10-27T00:00".
-                    // Open-Meteo times are local or GMT? 
-                    // We need to be careful. The solar-sim generation loop creates dates in local time usually if via `new Date()`, 
-                    // but `toISOString` converts to UTC.
-                    // Open-Meteo defaults to GMT if no timezone specified.
-                    // So both should be GMT.
-
                     // Open-Meteo format: "2023-10-27T00:00"
-                    // We can just use the first 16 chars.
+                    // solar-sim.ts uses: timeDt.toFormat("yyyy-MM-dd'T'HH:00")
+                    // Which results in the same format.
                     map[t] = data.cloud_cover[i];
                 });
                 setWeatherData(map);
@@ -120,8 +109,9 @@ export const Dashboard: React.FC = () => {
                     const load = daySteps.reduce((acc, s) => acc + s.loadConsumptionKw * 0.25, 0);
                     const minSoC = Math.min(...daySteps.map(s => s.batterySoC));
                     const maxSoC = Math.max(...daySteps.map(s => s.batterySoC));
+                    const avgCloud = daySteps.reduce((acc, s) => acc + (s.cloudCover || 0), 0) / daySteps.length;
 
-                    dailyStats.push({ date: dayStart, solar, load, minSoC, maxSoC });
+                    dailyStats.push({ date: dayStart, solar, load, minSoC, maxSoC, avgCloud });
                 }
             }
         }
@@ -168,10 +158,10 @@ export const Dashboard: React.FC = () => {
                 {
                     label: 'Cloud Cover (%)',
                     data: simulationResults.steps.map(s => (s.cloudCover || 0) * 100),
-                    borderColor: 'rgba(156, 163, 175, 0.5)',
-                    backgroundColor: 'rgba(156, 163, 175, 0.1)',
+                    borderColor: 'rgba(156, 163, 175, 0.8)',
+                    backgroundColor: 'rgba(156, 163, 175, 0.2)',
                     yAxisID: 'y1',
-                    borderWidth: 1,
+                    borderWidth: 2,
                     borderDash: [5, 5],
                     pointRadius: 0,
                     fill: true,
@@ -239,6 +229,15 @@ export const Dashboard: React.FC = () => {
                     borderColor: 'rgb(34, 197, 94)',
                     backgroundColor: 'rgb(34, 197, 94)',
                     yAxisID: 'y1',
+                },
+                {
+                    type: 'line',
+                    label: 'Avg Cloud (%)',
+                    data: simulationResults.dailyStats.map(s => (s.avgCloud || 0) * 100),
+                    borderColor: 'rgba(156, 163, 175, 0.8)',
+                    backgroundColor: 'rgba(156, 163, 175, 0.8)',
+                    yAxisID: 'y1',
+                    borderDash: [5, 5],
                 }
             ]
         };
