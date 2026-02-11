@@ -45,7 +45,9 @@ export const Dashboard: React.FC = () => {
 
         const fetchWeather = async () => {
             setIsLoadingWeather(true);
-            const data = await getHourlyCloudCover(location.latitude, location.longitude, simulationDate, simulationDays);
+            // Ensure we pass the start of the day in local terms to the weather service
+            const localStart = DateTime.fromJSDate(simulationDate).startOf('day').toJSDate();
+            const data = await getHourlyCloudCover(location.latitude, location.longitude, localStart, simulationDays);
             if (data) {
                 // Transform to Map
                 const map: { [key: string]: number } = {};

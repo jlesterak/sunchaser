@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 
 export interface HourlyWeatherData {
     time: string[];
@@ -26,7 +27,8 @@ export async function getHourlyCloudCover(
     days: number
 ): Promise<HourlyWeatherData | null> {
     try {
-        const startStr = startDate.toISOString().split('T')[0];
+        const startStr = DateTime.fromJSDate(startDate).toISODate();
+        if (!startStr) throw new Error("Invalid start date");
         // Open-Meteo uses YYYY-MM-DD format
 
         // Construct API URL
@@ -34,9 +36,9 @@ export async function getHourlyCloudCover(
         // For longer durations or past data, we might need 'archive' but let's stick to forecast for now as per requirements.
         // Open-Meteo allows specifying start_date and end_date.
 
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + days);
-        const endStr = endDate.toISOString().split('T')[0];
+        const endDate = DateTime.fromJSDate(startDate).plus({ days });
+        const endStr = endDate.toISODate();
+        if (!endStr) throw new Error("Invalid end date");
 
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover&start_date=${startStr}&end_date=${endStr}&timezone=auto`;
 

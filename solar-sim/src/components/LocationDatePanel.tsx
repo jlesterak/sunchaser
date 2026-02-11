@@ -44,7 +44,9 @@ export const LocationDatePanel: React.FC = () => {
                         value={DateTime.fromJSDate(simulationDate).toISODate() || ''}
                         onChange={(e) => {
                             if (e.target.value) {
-                                setSimulationDate(new Date(e.target.value));
+                                // Parse as local date to avoid UTC shift
+                                const dt = DateTime.fromISO(e.target.value);
+                                setSimulationDate(dt.toJSDate());
                             }
                         }}
                         className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
