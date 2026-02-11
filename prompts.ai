@@ -51,3 +51,9 @@ Can you please transcribe all of my requests for this entire project into a prom
 Can you add:
 The option to add a solar panel tilt angle & consider that in calculations
 The option to input voltage & AH of the battery and have each field (V, AH, KWH) update dynamically
+
+**Prompt 13:**
+Feature request:
+copy first hour of schedule of day to every hour
+Add cloud cover estimation to graphs
+Ability to enable/disable a load

@@ -15,6 +15,7 @@ export interface Load {
     powerWatts: number;
     schedule: LoadSchedule;
     color: string; // For UI visualization
+    enabled: boolean;
 }
 
 interface SystemState {
@@ -91,7 +92,12 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         }
         if (data.solarSpecs) setSolarSpecs(data.solarSpecs);
         if (data.location) setLocation(data.location);
-        if (data.loads) setLoads(data.loads);
+        if (data.loads) {
+            setLoads(data.loads.map((l: any) => ({
+                ...l,
+                enabled: l.enabled !== undefined ? l.enabled : true
+            })));
+        }
         if (data.simulationDate) setSimulationDate(new Date(data.simulationDate));
         if (data.simulationDays) setSimulationDays(data.simulationDays);
         if (data.useLiveWeather !== undefined) setUseLiveWeather(data.useLiveWeather);

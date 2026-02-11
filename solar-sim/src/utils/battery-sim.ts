@@ -18,6 +18,7 @@ export interface SimulationStep {
     gridImportKw: number; // If system is grid-tied or backup generator used (optional)
     batteryFlowKw: number; // Positive = Charging, Negative = Discharging
     usefulSolarKw: number; // Solar energy actually used (Load + Battery Charge)
+    cloudCover?: number; // 0-1
 }
 
 /**
@@ -29,7 +30,7 @@ export interface SimulationStep {
  * @returns Array of SimulationStep results
  */
 export function simulateBatterySystem(
-    solarData: { time: Date; powerKw: number }[],
+    solarData: { time: Date; powerKw: number; cloudCover?: number }[],
     loadData: { time: Date; powerKw: number }[],
     specs: BatterySpecs
 ): SimulationStep[] {
@@ -44,6 +45,8 @@ export function simulateBatterySystem(
         const solar = solarData[i].powerKw;
         const load = loadData[i].powerKw;
         const time = solarData[i].time;
+        const cloud = solarData[i].cloudCover;
+
 
         // Net power available (Solar - Load)
         const netPowerKw = solar - load;
@@ -146,7 +149,8 @@ export function simulateBatterySystem(
             batterySoC: currentEnergyKwh / specs.capacityKwh,
             gridImportKw,
             batteryFlowKw,
-            usefulSolarKw
+            usefulSolarKw,
+            cloudCover: cloud
         });
     }
 

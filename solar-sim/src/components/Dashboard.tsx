@@ -92,7 +92,7 @@ export const Dashboard: React.FC = () => {
 
             let totalLoadKw = 0;
             loads.forEach(load => {
-                if (load.schedule.activeSlots[slotIndex]) {
+                if (load.enabled && load.schedule.activeSlots[slotIndex]) {
                     totalLoadKw += load.powerWatts / 1000;
                 }
             });
@@ -164,6 +164,17 @@ export const Dashboard: React.FC = () => {
                     yAxisID: 'y1',
                     borderWidth: 2,
                     pointRadius: 0,
+                },
+                {
+                    label: 'Cloud Cover (%)',
+                    data: simulationResults.steps.map(s => (s.cloudCover || 0) * 100),
+                    borderColor: 'rgba(156, 163, 175, 0.5)',
+                    backgroundColor: 'rgba(156, 163, 175, 0.1)',
+                    yAxisID: 'y1',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: true,
                 },
             ],
         };

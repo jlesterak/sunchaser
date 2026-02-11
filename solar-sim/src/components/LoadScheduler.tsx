@@ -19,7 +19,8 @@ export const LoadScheduler: React.FC = () => {
             name: 'New Load',
             powerWatts: 100,
             color: `hsl(${Math.random() * 360}, 70%, 50%)`,
-            schedule: { activeSlots: new Array(672).fill(false) } // 7 * 96
+            schedule: { activeSlots: new Array(672).fill(false) }, // 7 * 96
+            enabled: true
         };
         addLoad(newLoad);
         setSelectedLoadId(newLoad.id);
@@ -62,6 +63,25 @@ export const LoadScheduler: React.FC = () => {
                 newSlots[(d * 96) + i] = sourceSlots[i];
             }
         });
+
+        updateLoad({
+            ...selectedLoad,
+            schedule: { activeSlots: newSlots }
+        });
+    };
+
+    const handleCopyFirstHourToDay = (dayIndex: number) => {
+        if (!selectedLoad) return;
+        const newSlots = [...selectedLoad.schedule.activeSlots];
+        // First hour is 4 slots (15 min each)
+        const firstHourSlots = newSlots.slice(dayIndex * 96, (dayIndex * 96) + 4);
+
+        // Repeat for the remaining 23 hours (23 * 4 = 92 slots)
+        for (let h = 1; h < 24; h++) {
+            for (let i = 0; i < 4; i++) {
+                newSlots[(dayIndex * 96) + (h * 4) + i] = firstHourSlots[i];
+            }
+        }
 
         updateLoad({
             ...selectedLoad,
@@ -118,13 +138,22 @@ export const LoadScheduler: React.FC = () => {
                                 }`}
                         >
                             <div className="flex justify-between items-start">
-                                <input
-                                    type="text"
-                                    value={load.name}
-                                    onChange={(e) => updateLoad({ ...load, name: e.target.value })}
-                                    className="bg-transparent font-medium focus:outline-none w-3/4"
-                                    onClick={(e) => e.stopPropagation()}
-                                />
+                                <div className="flex items-center gap-2 w-3/4">
+                                    <input
+                                        type="checkbox"
+                                        checked={load.enabled}
+                                        onChange={(e) => updateLoad({ ...load, enabled: e.target.checked })}
+                                        className="h-4 w-4 rounded border-zinc-700 bg-zinc-950 text-blue-600 focus:ring-blue-500"
+                                        onClick={(e) => e.stopPropagation()}
+                                    />
+                                    <input
+                                        type="text"
+                                        value={load.name}
+                                        onChange={(e) => updateLoad({ ...load, name: e.target.value })}
+                                        className={`bg-transparent font-medium focus:outline-none w-full ${!load.enabled ? 'text-zinc-500 line-through' : ''}`}
+                                        onClick={(e) => e.stopPropagation()}
+                                    />
+                                </div>
                                 <div className="flex gap-1">
                                     <button
                                         onClick={(e) => handleDuplicateLoad(e, load)}
@@ -186,6 +215,8 @@ export const LoadScheduler: React.FC = () => {
                                             {/* Dropdown menu */}
                                             <div className="absolute left-0 top-full pt-1 z-10 hidden group-hover:block w-48">
                                                 <div className="bg-zinc-800 border border-zinc-700 rounded shadow-xl py-1">
+                                                    <button onClick={() => handleCopyFirstHourToDay(dayIndex)} className="block w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-700 text-blue-400 hover:text-white transition-colors font-semibold">Copy First Hour to Day</button>
+                                                    <div className="border-t border-zinc-700 my-1"></div>
                                                     <button onClick={() => handleCopyDay(dayIndex, 'weekdays')} className="block w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors">Copy to Weekdays</button>
                                                     <button onClick={() => handleCopyDay(dayIndex, 'all')} className="block w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors">Copy to All Days</button>
                                                     <div className="border-t border-zinc-700 my-1"></div>
