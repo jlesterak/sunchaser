@@ -56,6 +56,7 @@ interface SystemContextType extends SystemState {
     useLiveWeather: boolean;
     setUseLiveWeather: (use: boolean) => void;
     importSystemData: (data: any) => void;
+    resetSystem: () => void;
 }
 
 const defaultBattery: BatterySpecs = {
@@ -199,12 +200,30 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         } else {
             if (data.devices) setDevices(data.devices);
             if (data.schedules) setSchedules(data.schedules);
-            if (data.presets) setPresets(data.presets);
         }
+
+        if (data.presets) setPresets(data.presets);
 
         if (data.simulationDate) setSimulationDate(new Date(data.simulationDate));
         if (data.simulationDays) setSimulationDays(data.simulationDays);
         if (data.useLiveWeather !== undefined) setUseLiveWeather(data.useLiveWeather);
+    };
+
+    const resetSystem = () => {
+        setBatterySpecs(defaultBattery);
+        setSolarSpecs(defaultSolar);
+        setLocation(defaultLocation);
+        setDevices(defaultDevices);
+        setSchedules(defaultSchedules);
+        setPresets([]);
+        setSimulationDate(() => {
+            const d = new Date();
+            d.setDate(d.getDate() + 1);
+            return d;
+        });
+        setSimulationDays(1);
+        setUseLiveWeather(false);
+        localStorage.removeItem('solar-sim-config');
     };
 
     // Load from LocalStorage on mount
@@ -231,7 +250,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
             simulationDate, setSimulationDate,
             simulationDays, setSimulationDays,
             useLiveWeather, setUseLiveWeather,
-            importSystemData
+            importSystemData,
+            resetSystem
         }}>
             {children}
         </SystemContext.Provider>

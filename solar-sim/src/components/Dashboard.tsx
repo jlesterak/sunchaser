@@ -15,6 +15,7 @@ import {
     Legend,
     Filler,
 } from 'chart.js';
+import zoomPlugin from 'chartjs-plugin-zoom';
 import { Line, Bar } from 'react-chartjs-2';
 import { DateTime } from 'luxon';
 import { Activity, CloudRain } from 'lucide-react';
@@ -28,7 +29,8 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    Filler
+    Filler,
+    zoomPlugin
 );
 
 export const Dashboard: React.FC = () => {
@@ -149,10 +151,10 @@ export const Dashboard: React.FC = () => {
     let chartOptions: any = {};
 
 
-    if (simulationDays === 1) {
+    if (simulationDays <= 7) {
         // DETAILED VIEW (Line Chart)
         chartData = {
-            labels: simulationResults.steps.map(s => DateTime.fromJSDate(s.time).toFormat('HH:mm')),
+            labels: simulationResults.steps.map(s => DateTime.fromJSDate(s.time).toFormat('MMM dd HH:mm')),
             datasets: [
                 {
                     label: 'Solar Gen (kW)',
@@ -198,20 +200,40 @@ export const Dashboard: React.FC = () => {
             interaction: { mode: 'index', intersect: false },
             stacked: false,
             plugins: {
-                legend: { labels: { color: '#e5e7eb' } }
+                legend: { labels: { color: '#e5e7eb' } },
+                zoom: { // Added Zoom plugin configuration
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                    },
+                    zoom: {
+                        wheel: { enabled: true },
+                        pinch: { enabled: true },
+                        mode: 'x',
+                    }
+                }
             },
             scales: {
                 y: {
                     type: 'linear', display: true, position: 'left',
                     title: { display: true, text: 'Power (kW)', color: '#9ca3af' },
-                    ticks: { color: '#9ca3af' }, grid: { color: '#374151' }
+                    ticks: { color: '#9ca3af' }, grid: { color: '#374151' },
+                    max: Math.max(
+                        ...simulationResults.steps.map(s => s.solarGenerationKw),
+                        ...simulationResults.steps.map(s => s.loadConsumptionKw)
+                    ) * 1.05 // Add a 5% padding to the top
                 },
                 y1: {
                     type: 'linear', display: true, position: 'right',
                     title: { display: true, text: 'Battery %', color: '#9ca3af' },
                     min: 0, max: 100, ticks: { color: '#9ca3af' }, grid: { drawOnChartArea: false }
                 },
-                x: { ticks: { color: '#9ca3af', maxTicksLimit: 12 }, grid: { color: '#374151' } }
+                x: {
+                    ticks: { color: '#9ca3af', maxTicksLimit: 12 },
+                    grid: { color: '#374151' },
+                    min: 0, // Keep initial view focused
+                    max: Math.min(simulationResults.steps.length - 1, 96) // Show only first 24 hours (96 15-min intervals) initially
+                }
             },
         };
 
@@ -269,7 +291,11 @@ export const Dashboard: React.FC = () => {
         chartOptions = {
             responsive: true,
             plugins: {
-                legend: { labels: { color: '#e5e7eb' } }
+                legend: { labels: { color: '#e5e7eb' } },
+                zoom: { // Enable panning on summary too
+                    pan: { enabled: true, mode: 'x' },
+                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+                }
             },
             scales: {
                 y: {
@@ -281,7 +307,12 @@ export const Dashboard: React.FC = () => {
                     title: { display: true, text: 'Min/Max SoC %', color: '#9ca3af' },
                     min: 0, max: 100, ticks: { color: '#9ca3af' }, grid: { drawOnChartArea: false }
                 },
-                x: { ticks: { color: '#9ca3af' }, grid: { color: '#374151' } }
+                x: {
+                    ticks: { color: '#9ca3af' },
+                    grid: { color: '#374151' },
+                    min: 0,
+                    max: Math.min(simulationResults.dailyStats.length - 1, 14) // Limit view to 14 days initially
+                }
             },
         };
     }
@@ -306,19 +337,26 @@ export const Dashboard: React.FC = () => {
                     )}
                 </h2>
 
-                <div className="flex bg-zinc-900 rounded p-1">
-                    {[1, 7, 14, 30].map(d => (
-                        <button
-                            key={d}
-                            onClick={() => setSimulationDays(d)}
-                            className={`px-3 py-1 rounded text-sm transition-colors ${simulationDays === d
-                                ? 'bg-zinc-700 text-white font-medium shadow'
-                                : 'text-zinc-500 hover:text-zinc-300'
-                                }`}
-                        >
-                            {d === 1 ? '24 Hours' : `${d} Days`}
-                        </button>
-                    ))}
+                <div className="flex items-center gap-1 sm:gap-2 bg-zinc-900 rounded p-1">
+                    <button onClick={() => setSimulationDays(1)} className={`px-2 py-1 rounded text-xs sm:text-sm transition-colors ${simulationDays === 1 ? 'bg-zinc-700 text-white shadow' : 'text-zinc-500 hover:text-zinc-300'}`}>1d</button>
+                    <button onClick={() => setSimulationDays(7)} className={`px-2 py-1 rounded text-xs sm:text-sm transition-colors ${simulationDays === 7 ? 'bg-zinc-700 text-white shadow' : 'text-zinc-500 hover:text-zinc-300'}`}>7d</button>
+                    <button onClick={() => setSimulationDays(30)} className={`px-2 py-1 rounded text-xs sm:text-sm transition-colors ${simulationDays === 30 ? 'bg-zinc-700 text-white shadow' : 'text-zinc-500 hover:text-zinc-300'}`}>30d</button>
+
+                    <div className="flex items-center gap-1 border-l border-zinc-700 pl-1 ml-1 sm:pl-2 sm:ml-1">
+                        <input
+                            type="number"
+                            min="1" max="31"
+                            value={simulationDays}
+                            onChange={(e) => {
+                                const val = parseInt(e.target.value);
+                                if (!isNaN(val) && val >= 1 && val <= 31) {
+                                    setSimulationDays(val);
+                                }
+                            }}
+                            className="w-10 sm:w-12 bg-zinc-800 border border-zinc-700 rounded px-1 py-1 text-center text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500"
+                        />
+                        <span className="text-xs text-zinc-400 hidden sm:inline">Days</span>
+                    </div>
                 </div>
             </div>
 

@@ -10,6 +10,7 @@ export const ConfigPanel: React.FC = () => {
         useLiveWeather, setUseLiveWeather,
         location, devices, schedules, presets, simulationDate, simulationDays,
         importSystemData,
+        resetSystem,
     } = useSystem();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -93,6 +94,12 @@ export const ConfigPanel: React.FC = () => {
         reader.readAsText(file);
         // Clear input
         if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    const handleReset = () => {
+        if (window.confirm('Are you sure you want to reset all settings to defaults? This will clear all devices, schedules, and presets. This action cannot be undone.')) {
+            resetSystem();
+        }
     };
 
     return (
@@ -238,6 +245,14 @@ export const ConfigPanel: React.FC = () => {
                             Save to Browser
                         </>
                     )}
+                </button>
+                <button
+                    onClick={handleReset}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-red-500"
+                    title="Reset all settings to defaults"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg>
+                    Reset
                 </button>
                 <input
                     type="file"

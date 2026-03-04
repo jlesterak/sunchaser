@@ -57,41 +57,42 @@ export const PresetManager: React.FC = () => {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-4">
                 {presets.map(preset => (
-                    <div key={preset.id} className="group bg-zinc-900 border border-zinc-700/50 hover:border-orange-500/50 p-3 rounded-lg flex items-center justify-between transition-all">
-                        <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="p-2 bg-zinc-800 rounded text-orange-400">
-                                <ListChecks size={18} />
+                    <div key={preset.id} className="group bg-zinc-900 border border-zinc-700/50 hover:border-orange-500/50 p-4 rounded-lg flex items-center justify-between transition-all gap-4">
+                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                            <div className="p-2.5 bg-zinc-800 rounded text-orange-400 flex-shrink-0">
+                                <ListChecks size={20} />
                             </div>
-                            <div className="overflow-hidden">
-                                <h3 className="text-sm font-medium text-white truncate">{preset.name}</h3>
-                                <p className="text-[10px] text-zinc-500">
+                            <div className="flex-1 min-w-0">
+                                <h3 className="text-base font-semibold text-white truncate w-full">{preset.name}</h3>
+                                <p className="text-xs text-zinc-500 mt-0.5">
                                     {preset.enabledScheduleIds.length} active schedules
                                 </p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                             <button
                                 onClick={() => applyPreset(preset.id)}
-                                className="flex items-center gap-1 px-3 py-1 bg-zinc-800 hover:bg-orange-600 text-zinc-300 hover:text-white rounded text-xs transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-orange-600 text-zinc-300 hover:text-white rounded-md text-sm font-medium transition-colors"
                             >
-                                <Play size={12} fill="currentColor" />
+                                <Play size={14} fill="currentColor" />
                                 Apply
                             </button>
                             <button
                                 onClick={() => removePreset(preset.id)}
-                                className="p-1.5 text-zinc-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                                className="p-2 text-zinc-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                                title="Delete Preset"
                             >
-                                <Trash2 size={14} />
+                                <Trash2 size={16} />
                             </button>
                         </div>
                     </div>
                 ))}
 
                 {presets.length === 0 && !isSaving && (
-                    <div className="sm:col-span-2 text-center py-6 border-2 border-dashed border-zinc-800 rounded-lg">
+                    <div className="text-center py-10 border-2 border-dashed border-zinc-800 rounded-lg">
                         <p className="text-zinc-500 text-sm">No presets saved yet.</p>
                         <button onClick={() => setIsSaving(true)} className="text-orange-400 text-sm hover:underline mt-1">Save your first configuration</button>
                     </div>
