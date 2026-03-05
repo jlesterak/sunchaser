@@ -211,47 +211,47 @@ export const ConfigPanel: React.FC = () => {
                 </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-zinc-700 flex gap-4">
+            <div className="mt-8 pt-6 border-t border-zinc-700 grid grid-cols-2 lg:flex lg:flex-row gap-2 sm:gap-4">
                 <button
                     onClick={handleExport}
-                    className="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-zinc-600"
+                    className="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-2 sm:px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-zinc-600 text-xs sm:text-sm"
                 >
-                    <Download size={18} />
+                    <Download size={16} />
                     Export
                 </button>
                 <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-zinc-600"
+                    className="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-2 sm:px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-zinc-600 text-xs sm:text-sm"
                 >
-                    <Upload size={18} />
+                    <Upload size={16} />
                     Import
                 </button>
                 <button
                     onClick={handleSaveToBrowser}
                     disabled={isSaving}
-                    className={`flex-[1.5] px-4 py-2 rounded flex items-center justify-center gap-2 transition-all border ${showSavedFeedback
+                    className={`col-span-2 lg:flex-[1.5] w-full px-2 sm:px-4 py-2 rounded flex items-center justify-center gap-2 transition-all border text-xs sm:text-sm ${showSavedFeedback
                         ? 'bg-green-600 border-green-500 text-white shadow-[0_0_15px_rgba(22,163,74,0.4)]'
                         : 'bg-blue-600 hover:bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-900/20'
                         }`}
                 >
                     {showSavedFeedback ? (
                         <>
-                            <Check size={18} className="animate-in zoom-in duration-300" />
+                            <Check size={16} className="animate-in zoom-in duration-300" />
                             Saved to Browser!
                         </>
                     ) : (
                         <>
-                            <Save size={18} />
+                            <Save size={16} />
                             Save to Browser
                         </>
                     )}
                 </button>
                 <button
                     onClick={handleReset}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-red-500"
+                    className="col-span-2 lg:flex-1 w-full bg-red-600 hover:bg-red-700 text-white px-2 sm:px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-red-500 text-xs sm:text-sm"
                     title="Reset all settings to defaults"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg>
                     Reset
                 </button>
                 <input

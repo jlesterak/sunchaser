@@ -84,27 +84,27 @@ export const DeviceManager: React.FC = () => {
 
             <div className="grid grid-cols-1 gap-3">
                 {devices.map(device => (
-                    <div key={device.id} className="group bg-zinc-900/50 border border-zinc-700/50 hover:border-zinc-500 p-3 rounded-lg flex items-center justify-between transition-all">
-                        <div className="flex items-center gap-4 flex-1">
-                            <div className="p-2 bg-zinc-800 rounded text-zinc-400 group-hover:text-blue-400 transition-colors">
+                    <div key={device.id} className="group bg-zinc-900/50 border border-zinc-700/50 hover:border-zinc-500 p-2 sm:p-3 rounded-lg flex items-center justify-between transition-all overflow-hidden gap-1 sm:gap-2">
+                        <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+                            <div className="p-1 sm:p-2 bg-zinc-800 rounded text-zinc-400 group-hover:text-blue-400 transition-colors shrink-0">
                                 <Smartphone size={18} />
                             </div>
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-0">
                                 <input
                                     type="text"
                                     value={device.name}
                                     onChange={(e) => updateDevice({ ...device, name: e.target.value })}
-                                    className="bg-transparent font-medium text-white focus:outline-none focus:border-b border-blue-500 w-full"
+                                    className="bg-transparent font-medium text-white focus:outline-none focus:border-b border-blue-500 w-full truncate"
                                 />
-                                <div className="flex items-center gap-1 mt-0.5 text-xs text-zinc-500">
+                                <div className="flex items-center gap-1 mt-0.5 text-[10px] sm:text-xs text-zinc-500">
                                     <PenLine size={10} />
                                     <span>Rename</span>
                                 </div>
-                                <div className="mt-2">
+                                <div className="mt-2 text-left">
                                     <select
                                         value={device.requiresDeviceId || ''}
                                         onChange={(e) => updateDevice({ ...device, requiresDeviceId: e.target.value || undefined })}
-                                        className="bg-zinc-800 text-[10px] text-zinc-400 border border-zinc-700 rounded px-1.5 py-0.5 focus:outline-none focus:border-blue-500"
+                                        className="bg-zinc-800 text-[10px] text-zinc-400 border border-zinc-700 rounded px-1.5 py-0.5 focus:outline-none focus:border-blue-500 max-w-[120px] sm:max-w-none"
                                     >
                                         <option value="">No Req.</option>
                                         {devices.filter(d => d.id !== device.id).map(d => (
@@ -115,21 +115,21 @@ export const DeviceManager: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-1 sm:gap-4 shrink-0">
                             <div className="text-right">
                                 <div className="flex items-center gap-1 border-b border-zinc-800 focus-within:border-blue-500">
                                     <input
                                         type="number"
                                         value={device.powerWatts}
                                         onChange={(e) => updateDevice({ ...device, powerWatts: parseInt(e.target.value) || 0 })}
-                                        className="bg-transparent text-sm text-white font-mono w-16 text-right focus:outline-none"
+                                        className="bg-transparent text-sm text-white font-mono w-12 sm:w-16 text-right focus:outline-none"
                                     />
                                     <span className="text-[10px] text-zinc-500 font-bold uppercase">W</span>
                                 </div>
                             </div>
                             <button
                                 onClick={() => removeDevice(device.id)}
-                                className="p-2 text-zinc-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                                className="p-1.5 sm:p-2 text-zinc-600 hover:text-red-400 transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100"
                                 title="Delete Device"
                             >
                                 <Trash2 size={16} />
