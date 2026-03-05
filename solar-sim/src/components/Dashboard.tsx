@@ -384,9 +384,9 @@ export const Dashboard: React.FC = () => {
                 </div>
             </div>
 
-            <div className="h-[400px]">
+            <div className="min-h-[400px] h-[50vh] w-full relative">
                 {/* @ts-ignore */}
-                <ChartComponent options={chartOptions} data={chartData} />
+                <ChartComponent options={{ ...chartOptions, maintainAspectRatio: false }} data={chartData} />
             </div>
         </div>
     );
